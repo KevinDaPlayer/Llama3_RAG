@@ -21,7 +21,6 @@ from flask import Flask
 # 這裡設定你的 PDF 文件的本地路徑
 PDF_FILE_PATH = r'C:\Users\32588\PycharmProjects\Llama_RAG\statics\pdfs\icd10cm_tabular_2023_test.pdf'
 
-
 loader = PyPDFLoader(PDF_FILE_PATH)
 docs = loader.load()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
@@ -45,19 +44,19 @@ prompt = PromptTemplate(
 
 
 async def rag_process(question):
-    retrieved_docs = retriever.invoke(question)  # 获取相关文档
+    retrieved_docs = retriever.invoke(question)
     print("Retrieved docs:", retrieved_docs)
-    print("Sample document object:", retrieved_docs[0].__dict__)  # 打印第一个文档对象的属性
+    print("Sample document object:", retrieved_docs[0].__dict__)
 
-    context = " ".join([doc.page_content for doc in retrieved_docs])  # 构建上下文
-    full_prompt = prompt.format(question=question, context=context)  # 填充模板
-    response_stream = llm.astream(full_prompt)  # 获取回答
+    context = " ".join([doc.page_content for doc in retrieved_docs])
+    full_prompt = prompt.format(question=question, context=context)
+    response_stream = llm.astream(full_prompt)
     full_response = ""
     async for resp_part in response_stream:
         full_response += resp_part.content
 
     print(full_response)
-    parsed_response = JsonOutputParser().parse(full_response)  # 解析回答
+    parsed_response = JsonOutputParser().parse(full_response)
     return parsed_response
 
 question = "This 65-year-old male has type 2 diabetes mellitus with diabetic chronic kidney disease stage 3 with insulindependent. He suffered from right chest pain after traffic accident on 7/20. According to the patient, he wasriding scooter collides with car. He came to our emergency department for help. Then right 4-7th ribsfracture, right hemopneumothorax and laceration of right lower leg were impression, during hospitalizationon right chest tube and sutured skin of laceration site were performed."
